@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbsenCeria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --pink-pastel: #F9D3E8;
+            --strawberry-red: #FF6B81;
+            --mint-blue: #B3E0E0;
+            --light-pink: #FFC0CB;
+            --gray-pastel: #D3D3D3;
+            --yellow-pastel: #FDFD96;
+            --dark-gray: #4B4B4B;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--pink-pastel);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark-gray);
+            padding: 2rem;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Login Page */
+        .login-card {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><filter id="f1" x="0" y="0"><feGaussianBlur in="SourceGraphic" stdDeviation="5" /></filter></defs><path d="M50,15 C40,0 20,0 10,15 L5,20 L15,25 L20,15 L30,20 L40,15 L50,25 Q60,30 70,25 Q80,20 90,25 Q100,30 95,40 Q90,50 85,50 L80,50 L75,55 L70,50 L65,55 L60,50 L55,55 Q50,60 45,55 Q40,50 35,55 Q30,60 25,55 Q20,50 15,55 Q10,60 5,55 L0,50 L0,45 Q5,40 10,40 Q15,40 20,45 Q25,50 30,45 Q35,40 40,45 Q45,50 50,45 Z" fill="%23F9D3E8" filter="url(%23f1)"/></svg>');
+            background-repeat: repeat-x;
+            background-position: center top;
+            background-size: 150%;
+            padding: 2rem;
+        }
+
+        .login-card h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--strawberry-red);
+            margin-bottom: 1.5rem;
+        }
+
+        .login-card label, .login-card input, .login-card select {
+            border-radius: 1rem;
+            border: 2px solid var(--pink-pastel);
+            padding: 0.75rem 1rem;
+            width: 100%;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-card button {
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 2rem;
+            transition: transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+        }
+        .login-card button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-card .tab-button {
+            background-color: var(--pink-pastel);
+            color: var(--dark-gray);
+            padding: 0.5rem 1.5rem;
+            border-radius: 1rem 1rem 0 0;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .login-card .tab-button.active {
+            background-color: white;
+            font-weight: 600;
+        }
+
+        /* Student Absensi Page */
+        .student-dashboard h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--strawberry-red);
+            margin-bottom: 2rem;
+        }
+        .attendance-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        .attendance-button {
+            min-height: 100px;
+            border-radius: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .attendance-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .attendance-button .icon {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+
+        .hadir { background-color: var(--strawberry-red); }
+        .sakit { background-color: var(--mint-blue); }
+        .izin { background-color: var(--light-pink); }
+        .alfa { background-color: var(--gray-pastel); }
+        .dispen { background-color: var(--yellow-pastel); }
+
+        /* Pop-up */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            line-height: 1.5;
+            max-width: 400px;
+        }
+        .popup-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--strawberry-red);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Teacher Dashboard */
+        .teacher-dashboard h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--strawberry-red);
+            margin-bottom: 1.5rem;
+        }
+        .teacher-dashboard .tab-switcher {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            border-radius: 1.5rem;
+            background-color: var(--pink-pastel);
+            padding: 0.5rem;
+        }
+        .teacher-dashboard .tab-switcher button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .teacher-dashboard .tab-switcher button.active {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-section {
+            display: none;
+        }
+        .dashboard-section.active {
+            display: block;
+        }
+        
+        .daily-list {
+            text-align: left;
+            margin-top: 1.5rem;
+        }
+        .daily-list .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--pink-pastel);
+            font-weight: 500;
+        }
+        .daily-list .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .donut-chart-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+        .donut-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--strawberry-red);
+            line-height: 1;
+        }
+
+        .monthly-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 1.5rem;
+        }
+        .monthly-table th, .monthly-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--pink-pastel);
+        }
+        .monthly-table th {
+            font-weight: 600;
+            background-color: var(--pink-pastel);
+        }
+
+        .bubble-chart-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin-top: 2rem;
+        }
+        
+        /* Student Report Page */
+        .student-report-card {
+            text-align: center;
+        }
+        .heart-chart-container {
+            position: relative;
+            width: 200px;
+            height: 180px;
+            margin: 2rem auto;
+        }
+        .heart-chart-container .percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        
+        .progress-bar-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .progress-bar {
+            flex-grow: 1;
+            height: 1rem;
+            border-radius: 0.5rem;
+            margin-left: 1rem;
+        }
+        
+        .report-table {
+            width: 100%;
+            border: 2px dashed var(--pink-pastel);
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        .report-table th, .report-table td {
+            padding: 0.75rem;
+            border: 2px dashed var(--pink-pastel);
+        }
+        .report-table th {
+            background-color: var(--pink-pastel);
+            font-weight: 600;
+        }
+        
+        .download-button {
+            background-color: var(--strawberry-red);
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-radius: 2rem;
+            margin-top: 2rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 107, 129, 0.4);
+        }
+        .download-button:hover {
+            transform: translateY(-3px);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Application View -->
+        <div id="app-view"></div>
+    </div>
+
+    <!-- Custom Pop-up Modal -->
+    <div id="popup-modal" class="popup-overlay">
+        <div class="popup-content">
+            <h3 id="popup-title"></h3>
+            <p id="popup-message"></p>
+        </div>
+    </div>
+    
+    <script>
+        // Data and State Management
+        const students = [
+            'Abdul Aziz Iliyin', 'Agia Ratu Anandita', 'Ahmad Fikri Syawaludin', 'Aliya Raihanah Farhani', 'Andini',
+            'Arham Rizal Khalani', 'Assyifa Fauziah', 'Balqis Ufairah Khoir', 'Cakra Qori Fatahillah', 'Claira Alkalifi Hendrawan',
+            'Dzaikra Dinar Giornata', 'Elen Dwi Al-Mira', 'Fatimah Az Zahra', 'Fayyadh Arkana Kazhim', 'Ghaisani Nazifa Alie',
+            'Hasifa Nur Lutfiah', 'Jesica Awlia Putri', 'Jibril Al Farizi', 'Karisa Maulidia', 'Livita Diana Putri',
+            'Meyla Fauziah Saputri', 'M. Rasyid Ridho. P', 'M. Bagus Bayu. E', 'M. Ramadhan Nur. K', 'M. Alfharezy',
+            'M. Fajar Kurniawan', 'M. Lintang Alfarizy. A', 'M. Sukma Wijaya', 'Nadiya Oktaviani', 'Naura Rizkya Kamila',
+            'Nihlatan Ignisshiyami', 'Nurmala Zulfa Lusfiah', 'Putra Mauldyin', 'Raisya Noer Rachelia', 'Randi Dwi Rahmawan',
+            'Ribka Davianti Kusbandiyah', 'Salman Alfarizi Hidayat', 'Salwa Daiyah Qurratu\'Ain', 'Shafira Nasyamah',
+            'Siti Hanna Mutia. F', 'Siti Susan Mulyasari', 'Syifana Faras Nafisah', 'Vidy Khoerunisa', 'Virgiawan Al Rasyid',
+            'Yaffa Saelatul Karimiyah', 'Zukhrufa Lungga Putri'
+        ];
+
+        const users = {
+            'guru': { username: 'guru', password: '123', role: 'teacher', name: 'Supriyanah Nareswari' },
+            'admin': { username: 'admin', password: '123', role: 'admin', name: 'Admin' }
+        };
+
+        // Simulate a database with localStorage
+        const db = {
+            get: (key) => JSON.parse(localStorage.getItem(key)) || [],
+            set: (key, value) => localStorage.setItem(key, JSON.stringify(value)),
+            push: (key, item) => {
+                const data = db.get(key);
+                data.push(item);
+                db.set(key, data);
+            }
+        };
+        
+        let currentState = {
+            view: 'login',
+            user: null,
+            dashboardTab: 'daily',
+            selectedStudent: null
+        };
+        
+        const appView = document.getElementById('app-view');
+        const popupModal = document.getElementById('popup-modal');
+        const popupTitle = document.getElementById('popup-title');
+        const popupMessage = document.getElementById('popup-message');
+
+        // Helper functions
+        const formatDate = (date) => date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        const formatTime = (date) => date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        const today = formatDate(new Date());
+
+        function showPopup(title, message) {
+            popupTitle.textContent = title;
+            popupMessage.textContent = message;
+            popupModal.style.display = 'flex';
+            setTimeout(() => {
+                popupModal.style.display = 'none';
+            }, 3000);
+        }
+
+        function render() {
+            appView.innerHTML = '';
+            switch (currentState.view) {
+                case 'login':
+                    renderLoginPage();
+                    break;
+                case 'student':
+                    renderStudentDashboard();
+                    break;
+                case 'teacher':
+                    renderTeacherDashboard();
+                    break;
+                case 'admin':
+                    renderTeacherDashboard(); // Admin shares the same dashboard
+                    break;
+                case 'studentReport':
+                    renderStudentReport();
+                    break;
+            }
+        }
+
+        // --- Login Page Rendering ---
+        function renderLoginPage() {
+            appView.innerHTML = `
+                <div class="login-card p-8 rounded-xl w-full max-w-sm mx-auto">
+                    <div class="flex justify-center mb-4">
+                        <button id="student-tab" class="tab-button active">Siswa/i</button>
+                        <button id="teacher-admin-tab" class="tab-button">Guru & Admin</button>
+                    </div>
+
+                    <div id="student-login" class="login-section">
+                        <h2 class="text-3xl font-bold text-center mb-4">Hai Siswa/i Hebat! ✨</h2>
+                        <div class="mb-4">
+                            <label for="student-name-select" class="block mb-2 font-medium">Pilih Namamu Di Sini 💖</label>
+                            <select id="student-name-select" class="w-full rounded-full border-2 border-pink-300 p-3 bg-pink-50 text-center text-lg">
+                                <option value="" disabled selected>Pilih Namamu Di Sini 💖</option>
+                                ${students.map(name => `<option value="${name}">${name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label for="student-password" class="block mb-2 font-medium">Masukkan Password Rahasiamu (psst.. 123 😉)</label>
+                            <input type="password" id="student-password" placeholder="Password" class="w-full rounded-full border-2 border-pink-300 p-3 text-center">
+                        </div>
+                        <button id="student-login-btn" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-6 rounded-full w-full shadow-lg">Masuk Kelas!</button>
+                    </div>
+
+                    <div id="teacher-admin-login" class="login-section hidden">
+                        <h2 class="text-3xl font-bold text-center mb-4">Khusus Guru & Admin 📄</h2>
+                        <div class="mb-4">
+                            <label for="teacher-username" class="block mb-2 font-medium">Username</label>
+                            <input type="text" id="teacher-username" placeholder="Username" class="w-full rounded-full border-2 border-red-300 p-3">
+                        </div>
+                        <div class="mb-6">
+                            <label for="teacher-password" class="block mb-2 font-medium">Password</label>
+                            <input type="password" id="teacher-password" placeholder="Password" class="w-full rounded-full border-2 border-red-300 p-3">
+                        </div>
+                        <button id="teacher-login-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-full w-full shadow-lg">Lihat Laporan 📄</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners
+            document.getElementById('student-tab').addEventListener('click', () => switchLoginTab('student'));
+            document.getElementById('teacher-admin-tab').addEventListener('click', () => switchLoginTab('teacher-admin'));
+            document.getElementById('student-login-btn').addEventListener('click', handleStudentLogin);
+            document.getElementById('teacher-login-btn').addEventListener('click', handleTeacherLogin);
+
+            function switchLoginTab(tab) {
+                const studentSection = document.getElementById('student-login');
+                const teacherAdminSection = document.getElementById('teacher-admin-login');
+                const studentTab = document.getElementById('student-tab');
+                const teacherAdminTab = document.getElementById('teacher-admin-tab');
+
+                if (tab === 'student') {
+                    studentSection.classList.remove('hidden');
+                    teacherAdminSection.classList.add('hidden');
+                    studentTab.classList.add('active');
+                    teacherAdminTab.classList.remove('active');
+                } else {
+                    studentSection.classList.add('hidden');
+                    teacherAdminSection.classList.remove('hidden');
+                    studentTab.classList.remove('active');
+                    teacherAdminTab.classList.add('active');
+                }
+            }
+        }
+
+        function handleStudentLogin() {
+            const name = document.getElementById('student-name-select').value;
+            const password = document.getElementById('student-password').value;
+
+            if (name && password === '123') {
+                currentState.user = { name, role: 'student' };
+                currentState.view = 'student';
+                render();
+            } else {
+                showPopup('Gagal!', 'Nama atau password salah. Coba lagi ya!');
+            }
+        }
+
+        function handleTeacherLogin() {
+            const username = document.getElementById('teacher-username').value;
+            const password = document.getElementById('teacher-password').value;
+
+            const user = users[username];
+            if (user && user.password === password) {
+                currentState.user = user;
+                currentState.view = 'teacher';
+                render();
+            } else {
+                showPopup('Gagal!', 'Username atau password salah. Coba lagi ya!');
+            }
+        }
+
+        // --- Student Dashboard Rendering ---
+        function renderStudentDashboard() {
+            const studentName = currentState.user.name;
+            const todayAttendance = db.get('attendance').find(record => record.name === studentName && record.date === today);
+            
+            appView.innerHTML = `
+                <div class="student-dashboard text-center">
+                    <h1 class="text-2xl font-bold">Selamat Datang, ${studentName}! 🌸</h1>
+                    <p class="text-xl mb-8">Hari ini kamu... ${todayAttendance ? `sudah absen sebagai <span class="font-semibold">${todayAttendance.status}</span>!` : ''}</p>
+                    
+                    <div class="attendance-buttons">
+                        <button class="attendance-button hadir shadow-lg" data-status="Hadir">
+                            <span class="icon">🌟</span>
+                            Hadir
+                        </button>
+                        <button class="attendance-button sakit shadow-lg" data-status="Sakit">
+                            <span class="icon">😷</span>
+                            Sakit
+                        </button>
+                        <button class="attendance-button izin shadow-lg" data-status="Izin">
+                            <span class="icon">❤️</span>
+                            Izin
+                        </button>
+                        <button class="attendance-button alfa shadow-lg" data-status="Alfa">
+                            <span class="icon">💌</span>
+                            Alfa
+                        </button>
+                        <button class="attendance-button dispen shadow-lg" data-status="Dispen">
+                            <span class="icon">❌</span>
+                            Dispen
+                        </button>
+                    </div>
+                    
+                    <button id="logout-btn" class="mt-8 bg-gray-200 text-gray-700 py-2 px-6 rounded-full font-semibold hover:bg-gray-300">Keluar</button>
+                </div>
+            `;
+            
+            // Add event listeners
+            document.querySelectorAll('.attendance-button').forEach(button => {
+                button.addEventListener('click', handleStudentAttendance);
+            });
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                currentState = { view: 'login', user: null };
+                render();
+            });
+        }
+
+        function handleStudentAttendance(event) {
+            const status = event.currentTarget.dataset.status;
+            const studentName = currentState.user.name;
+            const todayAttendance = db.get('attendance').find(record => record.name === studentName && record.date === today);
+
+            if (todayAttendance) {
+                showPopup('Sudah Absen!', `Kamu sudah absen hari ini sebagai ${todayAttendance.status}. Tidak perlu absen lagi ya.`);
+                return;
+            }
+
+            const newRecord = {
+                name: studentName,
+                status: status,
+                date: today,
+                timestamp: new Date().toISOString()
+            };
+            db.push('attendance', newRecord);
+
+            showPopup('Absensi Tercatat!', `Absensi kamu sebagai ${status} sudah tercatat! Semangat Belajar ya! 🎉`);
+            render(); // Re-render to show updated status
+        }
+
+        // --- Teacher Dashboard Rendering ---
+        function renderTeacherDashboard() {
+            appView.innerHTML = `
+                <div class="teacher-dashboard">
+                    <h1 class="text-3xl font-bold text-center mb-6">Dasbor Laporan Ceria 📄</h1>
+                    <div class="flex justify-center mb-6">
+                        <button id="logout-btn" class="bg-gray-200 text-gray-700 py-2 px-6 rounded-full font-semibold hover:bg-gray-300">Keluar</button>
+                    </div>
+                    
+                    <div class="tab-switcher">
+                        <button id="daily-tab" class="active">Laporan Harian</button>
+                        <button id="weekly-tab">Laporan Mingguan</button>
+                        <button id="monthly-tab">Laporan Bulanan</button>
+                    </div>
+                    
+                    <div id="daily-section" class="dashboard-section active"></div>
+                    <div id="weekly-section" class="dashboard-section"></div>
+                    <div id="monthly-section" class="dashboard-section"></div>
+                </div>
+            `;
+
+            // Add event listeners for tabs
+            document.getElementById('daily-tab').addEventListener('click', () => switchDashboardTab('daily'));
+            document.getElementById('weekly-tab').addEventListener('click', () => switchDashboardTab('weekly'));
+            document.getElementById('monthly-tab').addEventListener('click', () => switchDashboardTab('monthly'));
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                currentState = { view: 'login', user: null };
+                render();
+            });
+
+            function switchDashboardTab(tab) {
+                currentState.dashboardTab = tab;
+                document.querySelectorAll('.tab-switcher button').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(`${tab}-tab`).classList.add('active');
+                
+                document.querySelectorAll('.dashboard-section').forEach(sec => sec.classList.remove('active'));
+                document.getElementById(`${tab}-section`).classList.add('active');
+
+                renderDashboardContent();
+            }
+
+            renderDashboardContent();
+            
+            // Re-render dashboard content on attendance change
+            window.addEventListener('storage', renderDashboardContent);
+        }
+        
+        function renderDashboardContent() {
+            const allAttendance = db.get('attendance');
+            const dailySection = document.getElementById('daily-section');
+            const weeklySection = document.getElementById('weekly-section');
+            const monthlySection = document.getElementById('monthly-section');
+
+            switch (currentState.dashboardTab) {
+                case 'daily':
+                    renderDailyReport(dailySection, allAttendance);
+                    break;
+                case 'weekly':
+                    renderWeeklyReport(weeklySection, allAttendance);
+                    break;
+                case 'monthly':
+                    renderMonthlyReport(monthlySection, allAttendance);
+                    break;
+            }
+        }
+        
+        // --- Daily Report ---
+        function renderDailyReport(element, attendanceData) {
+            const todayRecords = attendanceData.filter(rec => rec.date === today);
+            const attendedStudents = todayRecords.map(rec => rec.name);
+            
+            element.innerHTML = `
+                <h2 class="text-2xl font-bold">Laporan Harian Ceria! ☀️ - ${today}</h2>
+                <div class="daily-list mt-6">
+                    ${students.map(name => {
+                        const record = todayRecords.find(rec => rec.name === name);
+                        let status = 'Belum Absen 🤔';
+                        let statusIcon = '🤔';
+                        let textColor = 'text-gray-400';
+                        if (record) {
+                            switch(record.status) {
+                                case 'Hadir': status = 'Hadir'; statusIcon = '🌟'; textColor = 'text-green-500'; break;
+                                case 'Sakit': status = 'Sakit'; statusIcon = '😷'; textColor = 'text-blue-500'; break;
+                                case 'Izin': status = 'Izin'; statusIcon = '❤️'; textColor = 'text-pink-500'; break;
+                                case 'Alfa': status = 'Alfa'; statusIcon = '💌'; textColor = 'text-red-500'; break;
+                                case 'Dispen': status = 'Dispen'; statusIcon = '❌'; textColor = 'text-yellow-500'; break;
+                            }
+                        }
+                        return `
+                            <div class="list-item">
+                                <span class="font-semibold cursor-pointer hover:underline" data-student-name="${name}">${name}</span>
+                                <span class="${textColor} font-bold">${status} ${statusIcon}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            element.querySelectorAll('[data-student-name]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    currentState.selectedStudent = e.target.dataset.studentName;
+                    currentState.view = 'studentReport';
+                    render();
+                });
+            });
+        }
+        
+        // --- Weekly Report ---
+        function renderWeeklyReport(element, attendanceData) {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const weeklyRecords = attendanceData.filter(rec => new Date(rec.timestamp) >= oneWeekAgo);
+
+            const statusCounts = { 'Hadir': 0, 'Sakit': 0, 'Izin': 0, 'Alfa': 0, 'Dispen': 0 };
+            weeklyRecords.forEach(rec => statusCounts[rec.status]++);
+
+            const totalRecords = weeklyRecords.length;
+            const percentages = Object.keys(statusCounts).map(status => ({
+                status,
+                percentage: totalRecords > 0 ? (statusCounts[status] / totalRecords) * 100 : 0
+            }));
+
+            element.innerHTML = `
+                <h2 class="text-2xl font-bold mb-4">Semangat Kelas Seminggu Ini! 🌈</h2>
+                <div class="donut-chart-container">
+                    <canvas id="weekly-donut-chart" width="250" height="250"></canvas>
+                    <div class="donut-text">
+                        ${percentages.find(p => p.status === 'Hadir').percentage.toFixed(0)}% Hadir
+                    </div>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4 mt-4">
+                    ${percentages.map(p => `
+                        <div class="flex items-center">
+                            <span class="inline-block w-4 h-4 rounded-full mr-2" style="background-color: ${getAttendanceColor(p.status)}"></span>
+                            <span class="text-sm">${p.status} (${p.percentage.toFixed(0)}%)</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            drawDonutChart('weekly-donut-chart', percentages);
+        }
+        
+        // --- Monthly Report ---
+        function renderMonthlyReport(element, attendanceData) {
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+            const monthlyRecords = attendanceData.filter(rec => new Date(rec.timestamp) >= oneMonthAgo);
+            
+            const studentStats = {};
+            students.forEach(s => studentStats[s] = { 'Hadir': 0, 'Sakit': 0, 'Izin': 0, 'Alfa': 0, 'Dispen': 0, total: 0 });
+
+            monthlyRecords.forEach(rec => {
+                if (studentStats[rec.name]) {
+                    studentStats[rec.name][rec.status]++;
+                    studentStats[rec.name].total++;
+                }
+            });
+
+            element.innerHTML = `
+                <h2 class="text-2xl font-bold mb-4">Laporan Bulanan Penuh Warna 💖</h2>
+                <div class="overflow-x-auto">
+                    <table class="monthly-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Siswa/i</th>
+                                <th>Hadir</th>
+                                <th>Sakit</th>
+                                <th>Izin</th>
+                                <th>Alfa</th>
+                                <th>Dispen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.keys(studentStats).map(name => `
+                                <tr>
+                                    <td class="font-semibold cursor-pointer hover:underline" data-student-name="${name}">${name}</td>
+                                    <td>${studentStats[name]['Hadir']}</td>
+                                    <td>${studentStats[name]['Sakit']}</td>
+                                    <td>${studentStats[name]['Izin']}</td>
+                                    <td>${studentStats[name]['Alfa']}</td>
+                                    <td>${studentStats[name]['Dispen']}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            element.querySelectorAll('[data-student-name]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    currentState.selectedStudent = e.target.dataset.studentName;
+                    currentState.view = 'studentReport';
+                    render();
+                });
+            });
+        }
+        
+        // --- Student Report Rendering ---
+        function renderStudentReport() {
+            const studentName = currentState.selectedStudent;
+            const studentRecords = db.get('attendance').filter(rec => rec.name === studentName);
+            const allRecordsCount = studentRecords.length;
+            
+            const statusCounts = { 'Hadir': 0, 'Sakit': 0, 'Izin': 0, 'Alfa': 0, 'Dispen': 0 };
+            const absentRecords = [];
+            
+            studentRecords.forEach(rec => {
+                statusCounts[rec.status]++;
+                if (rec.status !== 'Hadir') {
+                    absentRecords.push(rec);
+                }
+            });
+
+            const hadirPercentage = allRecordsCount > 0 ? (statusCounts['Hadir'] / allRecordsCount) * 100 : 0;
+            const percentages = Object.keys(statusCounts).map(status => ({
+                status,
+                percentage: allRecordsCount > 0 ? (statusCounts[status] / allRecordsCount) * 100 : 0
+            }));
+            
+            appView.innerHTML = `
+                <div class="student-report-card text-center">
+                    <h1 class="text-3xl font-bold mb-2">${studentName}</h1>
+                    <p class="text-gray-500 mb-6">Laporan Absensi Siswa</p>
+                    
+                    <div class="heart-chart-container">
+                        <canvas id="heart-chart" width="200" height="180"></canvas>
+                        <div class="percentage">${hadirPercentage.toFixed(0)}%</div>
+                    </div>
+
+                    <div class="w-full max-w-md mx-auto mt-8">
+                        ${percentages.map(p => `
+                            <div class="progress-bar-group">
+                                <span class="font-semibold w-20 text-left">${p.status}</span>
+                                <div class="w-full bg-gray-200 rounded-full h-4 relative">
+                                    <div class="absolute h-4 rounded-full" style="width: ${p.percentage}%; background-color: ${getAttendanceColor(p.status)};"></div>
+                                </div>
+                                <span class="ml-2 w-10 text-right">${p.percentage.toFixed(0)}%</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mt-8 mb-4">Rincian Ketidakhadiran</h3>
+                    ${absentRecords.length > 0 ? `
+                        <div class="overflow-x-auto">
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Status</th>
+                                        <th>Waktu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${absentRecords.map(rec => `
+                                        <tr>
+                                            <td>${rec.date}</td>
+                                            <td>${rec.status}</td>
+                                            <td>${formatTime(new Date(rec.timestamp))}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : `<p>Tidak ada catatan ketidakhadiran. Hebat! 🎉</p>`}
+                    
+                    <button id="download-report-btn" class="download-button">
+                        Unduh Laporan Pink! 📄
+                    </button>
+                    <button id="back-btn" class="mt-4 bg-gray-200 text-gray-700 py-2 px-6 rounded-full font-semibold hover:bg-gray-300">Kembali</button>
+                </div>
+            `;
+            
+            drawHeartChart('heart-chart', hadirPercentage);
+            
+            document.getElementById('back-btn').addEventListener('click', () => {
+                currentState.selectedStudent = null;
+                currentState.view = 'teacher';
+                render();
+            });
+            document.getElementById('download-report-btn').addEventListener('click', () => {
+                showPopup('Fitur Unduh', 'Fitur unduh laporan tidak diaktifkan pada demo ini.');
+            });
+        }
+        
+        // --- Canvas Drawing Functions ---
+        function getAttendanceColor(status) {
+            switch (status) {
+                case 'Hadir': return 'var(--strawberry-red)';
+                case 'Sakit': return 'var(--mint-blue)';
+                case 'Izin': return 'var(--light-pink)';
+                case 'Alfa': return 'var(--gray-pastel)';
+                case 'Dispen': return 'var(--yellow-pastel)';
+                default: return 'var(--dark-gray)';
+            }
+        }
+        
+        function drawDonutChart(canvasId, data) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const total = data.reduce((sum, item) => sum + item.percentage, 0);
+            let startAngle = 0;
+            const center = canvas.width / 2;
+            const radius = 100;
+            const holeRadius = 60;
+
+            data.forEach(item => {
+                const sliceAngle = (item.percentage / total) * 2 * Math.PI;
+                ctx.beginPath();
+                ctx.arc(center, center, radius, startAngle, startAngle + sliceAngle);
+                ctx.arc(center, center, holeRadius, startAngle + sliceAngle, startAngle, true);
+                ctx.closePath();
+                ctx.fillStyle = getAttendanceColor(item.status);
+                ctx.fill();
+                startAngle += sliceAngle;
+            });
+        }
+        
+        function drawHeartChart(canvasId, percentage) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const heartPath = new Path2D();
+            
+            // Heart shape coordinates
+            const x = canvas.width / 2;
+            const y = canvas.height / 2;
+            const size = 150;
+            
+            heartPath.moveTo(x, y + size * 0.4);
+            heartPath.bezierCurveTo(x + size * 0.5, y - size * 0.3, x + size * 0.8, y + size * 0.1, x, y + size * 0.4);
+            heartPath.bezierCurveTo(x - size * 0.8, y + size * 0.1, x - size * 0.5, y - size * 0.3, x, y + size * 0.4);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw full heart outline
+            ctx.fillStyle = '#FFC0CB';
+            ctx.fill(heartPath);
+
+            // Create a clipping path from the heart shape
+            ctx.save();
+            ctx.clip(heartPath);
+
+            // Fill heart with a percentage
+            const fillHeight = canvas.height * (percentage / 100);
+            ctx.fillStyle = '#FF6B81';
+            ctx.fillRect(0, canvas.height - fillHeight, canvas.width, fillHeight);
+            
+            ctx.restore();
+        }
+
+        // Initial render on page load
+        render();
+
+    </script>
+</body>
+</html>
